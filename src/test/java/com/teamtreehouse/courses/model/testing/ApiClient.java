@@ -26,7 +26,7 @@ public class ApiClient {
             connection.setRequestMethod(method);
             connection.setRequestProperty("Content-Type", "application/json");
             if (requetBody != null){
-                connection.setDoInput(true);
+                connection.setDoOutput(true);
                 try (OutputStream outputStream = connection.getOutputStream()){
                     outputStream.write(requetBody.getBytes("UTF-8"));
                 }

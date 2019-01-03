@@ -1,6 +1,9 @@
 package com.teamtreehouse.courses.model;
 
 import com.google.gson.Gson;
+import com.teamtreehouse.courses.model.dao.CourseDAO;
+import com.teamtreehouse.courses.model.dao.Sql2oCourseDAO;
+import com.teamtreehouse.courses.model.exc.DaoException;
 import com.teamtreehouse.courses.model.testing.ApiClient;
 import com.teamtreehouse.courses.model.testing.ApiResponse;
 import org.junit.*;
@@ -19,6 +22,7 @@ public class ApiTest {
     private Connection conn;
     private ApiClient client;
     private Gson gson ;
+    private CourseDAO courseDao;
 
     @BeforeClass
     public static void startServer() {
@@ -38,6 +42,7 @@ public class ApiTest {
         conn = sql2o.open();
         client = new ApiClient("http://localhost:" + PORT);
         gson = new Gson();
+        courseDao = new Sql2oCourseDAO(sql2o);
     }
 
     @After
@@ -54,5 +59,21 @@ public class ApiTest {
         ApiResponse res = client.request("POST", "/courses", gson.toJson(values));
 
         assertEquals(201, res.getStatus());
+    }
+
+    @Test
+    public void coursesCanBeAccessedById() throws DaoException {
+        Course course = newTestCourse();
+        courseDao.add(course);
+
+        ApiResponse response =
+                client.request("GET", "/courses/" + course.getId());
+        Course retrieved = gson.fromJson(response.getBody(), Course.class);
+
+        assertEquals(course, retrieved);
+    }
+
+    private Course newTestCourse() {
+        return new Course("Test", "http://test.com");
     }
 }

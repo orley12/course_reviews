@@ -1,3 +1,5 @@
+package com.teamtreehouse.courses.model.dao;
+
 import com.teamtreehouse.courses.model.Course;
 import com.teamtreehouse.courses.model.dao.Sql2oCourseDAO;
 import com.teamtreehouse.courses.model.exc.DaoException;
