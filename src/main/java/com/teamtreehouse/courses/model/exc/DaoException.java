@@ -1,4 +1,4 @@
-package come.teamtreehouse.courses.model.exc;
+package com.teamtreehouse.courses.model.exc;
 
 public class DaoException extends Exception {
 

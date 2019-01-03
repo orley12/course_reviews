@@ -1,8 +1,7 @@
-package come.teamtreehouse.courses.model.dao;
+package com.teamtreehouse.courses.model.dao;
 
-import come.teamtreehouse.courses.model.Course;
-import come.teamtreehouse.courses.model.dao.CourseDAO;
-import come.teamtreehouse.courses.model.exc.DaoException;
+import com.teamtreehouse.courses.model.Course;
+import com.teamtreehouse.courses.model.exc.DaoException;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
@@ -39,4 +38,12 @@ public class Sql2oCourseDAO implements CourseDAO {
                      .executeAndFetch(Course.class);
          }
     }
+
+    @Override
+    public Course findById(int id) {
+        try(Connection connection = sql2o.open()){
+            return connection.createQuery("SELECT * from courses WHERE id = :id")
+                    .addParameter("id", id)
+                    .executeAndFetchFirst(Course.class);
+        }    }
 }

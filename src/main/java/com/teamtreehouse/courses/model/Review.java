@@ -1,4 +1,4 @@
-package come.teamtreehouse.courses.model;
+package com.teamtreehouse.courses.model;
 
 import java.util.Objects;
 

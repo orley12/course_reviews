@@ -1,7 +1,7 @@
-package come.teamtreehouse.courses.model.dao;
+package com.teamtreehouse.courses.model.dao;
 
-import come.teamtreehouse.courses.model.Review;
-import come.teamtreehouse.courses.model.exc.DaoException;
+import com.teamtreehouse.courses.model.Review;
+import com.teamtreehouse.courses.model.exc.DaoException;
 
 import java.util.List;
 
