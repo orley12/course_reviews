@@ -28,7 +28,6 @@ public class Sql2oCourseDAO implements CourseDAO {
         }catch (Sql2oException ex){
             throw new DaoException(ex, "Problem adding course");
         }
-
     }
 
     @Override
@@ -45,5 +44,6 @@ public class Sql2oCourseDAO implements CourseDAO {
             return connection.createQuery("SELECT * from courses WHERE id = :id")
                     .addParameter("id", id)
                     .executeAndFetchFirst(Course.class);
-        }    }
+        }
+    }
 }

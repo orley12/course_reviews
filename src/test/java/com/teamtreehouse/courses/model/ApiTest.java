@@ -2,7 +2,9 @@ package com.teamtreehouse.courses.model;
 
 import com.google.gson.Gson;
 import com.teamtreehouse.courses.model.dao.CourseDAO;
+import com.teamtreehouse.courses.model.dao.ReviewDAO;
 import com.teamtreehouse.courses.model.dao.Sql2oCourseDAO;
+import com.teamtreehouse.courses.model.dao.Sql2oReviewDAO;
 import com.teamtreehouse.courses.model.exc.DaoException;
 import com.teamtreehouse.courses.model.testing.ApiClient;
 import com.teamtreehouse.courses.model.testing.ApiResponse;
@@ -23,6 +25,7 @@ public class ApiTest {
     private ApiClient client;
     private Gson gson ;
     private CourseDAO courseDao;
+    private ReviewDAO reviewDAO;
 
     @BeforeClass
     public static void startServer() {
@@ -43,7 +46,8 @@ public class ApiTest {
         client = new ApiClient("http://localhost:" + PORT);
         gson = new Gson();
         courseDao = new Sql2oCourseDAO(sql2o);
-    }
+        reviewDAO = new Sql2oReviewDAO(sql2o);
+        }
 
     @After
     public void tearDown() throws Exception {
@@ -71,6 +75,47 @@ public class ApiTest {
         Course retrieved = gson.fromJson(response.getBody(), Course.class);
 
         assertEquals(course, retrieved);
+    }
+
+    @Test
+    public void addingReviewReturnsreatedStatus() throws DaoException {
+        Course course = newTestCourse();
+        courseDao.add(course);
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("rating", 5);
+        values.put("comment", "Kennenth as an awesome beard");
+
+        ApiResponse res = client.request("POST", "/courses/1", gson.toJson(values));
+
+        assertEquals(201, res.getStatus());
+    }
+
+    @Test
+    public void addingReviewToUnknownCourseThrowsError() throws DaoException {
+        Map<String, Object> values = new HashMap<>();
+        values.put("rating", 5);
+        values.put("comment", "Kennenth as an awesome beard");
+
+        ApiResponse res = client.request("GET", "/courses/47", gson.toJson(values));
+
+        assertEquals(500, res.getStatus());
+    }
+
+    @Test
+    public void findsMultipleReviewForSingleCourseById() throws DaoException {
+        Course course = newTestCourse();
+        courseDao.add(course);
+
+        reviewDAO.add(new Review(course.getId(), 5, "Was an awesome Course"));
+        reviewDAO.add(new Review(course.getId(), 4, "Was an amazing Course"));
+        reviewDAO.add(new Review(course.getId(), 1, "Course Test"));
+
+        ApiResponse res = client.request("GET", "/courses/1/reviews");
+
+        Review[] reviews = gson.fromJson(res.getBody(), Review[].class);
+
+        assertEquals(3, reviews.length);
     }
 
     @Test

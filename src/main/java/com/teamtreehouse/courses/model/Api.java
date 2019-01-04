@@ -2,11 +2,15 @@ package com.teamtreehouse.courses.model;
 
 import com.google.gson.Gson;
 import com.teamtreehouse.courses.model.dao.CourseDAO;
+import com.teamtreehouse.courses.model.dao.ReviewDAO;
 import com.teamtreehouse.courses.model.dao.Sql2oCourseDAO;
+import com.teamtreehouse.courses.model.dao.Sql2oReviewDAO;
 import com.teamtreehouse.courses.model.exc.ApiError;
+import com.teamtreehouse.courses.model.exc.DaoException;
 import org.sql2o.Sql2o;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static spark.Spark.*;
@@ -27,6 +31,7 @@ public class Api {
                 new Sql2o(String.format("%s;INIT=RUNSCRIPT from 'classpath:db/init.sql'", dataSoursce)
                         ,"","");
         CourseDAO courseDAO = new Sql2oCourseDAO(sql2o);
+        ReviewDAO reviewDAO = new Sql2oReviewDAO(sql2o);
         Gson gson = new Gson();
 
         post("/courses", "application/json", (req, res) -> {
@@ -48,6 +53,25 @@ public class Api {
             }
                 return course;
                 },gson::toJson);
+
+        post("/courses/:courseId", "application/json", (req, res) ->{
+            int courseId = Integer.parseInt(req.params("courseId"));
+            Review review = gson.fromJson(req.body(), Review.class);
+            review.setCourseId(courseId);
+            try {
+                reviewDAO.add(review);
+            }catch (DaoException ex){
+                throw new ApiError(500, ex.getMessage());
+            }
+            res.status(201);
+            return review;
+        }, gson::toJson);
+
+        get("/courses/:courseId/reviews",(req, res) ->{
+            int courseId = Integer.parseInt(req.params("courseId"));
+            List<Review> courseReviews = reviewDAO.findCourseById(courseId);
+            return courseReviews;
+        }, gson::toJson);
 
         /*this represents our catch block for the servers errors this will catch the Server Error that is thrown
          *we cast this server error into the ApiError Object and we call the methods of the ApiError object
