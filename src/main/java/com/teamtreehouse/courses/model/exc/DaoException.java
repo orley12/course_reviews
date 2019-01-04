@@ -2,7 +2,7 @@ package com.teamtreehouse.courses.model.exc;
 
 public class DaoException extends Exception {
 
-    private final Exception originalException;
+    private Exception originalException;
 
     public DaoException(Exception originalException, String msg) {
         super(msg);

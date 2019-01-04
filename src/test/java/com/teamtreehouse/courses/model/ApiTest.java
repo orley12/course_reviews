@@ -73,6 +73,14 @@ public class ApiTest {
         assertEquals(course, retrieved);
     }
 
+    @Test
+    public void missingCoursesReturnNotFoundStatus() {
+        ApiResponse response = client.request("GET", "/courses/42");
+        assertEquals(404, response.getStatus());
+
+
+    }
+
     private Course newTestCourse() {
         return new Course("Test", "http://test.com");
     }
